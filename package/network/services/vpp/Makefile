@@ -54,10 +54,12 @@ endef
 define Package/vpp/install
 	$(CP) $(PKG_BUILD_DIR)/build-root/install-vpp_debug-native/external/lib64/* \
 		$(PKG_BUILD_DIR)/build-root/install-vpp_debug-native/external/lib
+	if [ -e $(TOPDIR)/package/network/services/vpp/dpdk_plugin.so.gz ]; then \
+		gzip -d $(TOPDIR)/package/network/services/vpp/dpdk_plugin.so.gz; \
+	fi
 	$(INSTALL_DIR) $(1)/bin $(1)/etc $(1)/include
 	$(INSTALL_DIR) $(1)/lib $(1)/libexec
 	$(INSTALL_DIR) $(1)/sbin $(1)/share
-	gzip -d $(TOPDIR)/package/network/services/vpp/dpdk_plugin.so.gz
 	$(CP) $(PKG_BUILD_DIR)/build-root/install-vpp_debug-native/external/bin/* $(1)/bin
 	$(CP) $(PKG_BUILD_DIR)/build-root/install-vpp_debug-native/external/etc/* $(1)/etc
 	$(CP) $(PKG_BUILD_DIR)/build-root/install-vpp_debug-native/external/include/* $(1)/include
