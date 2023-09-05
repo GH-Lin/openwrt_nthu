@@ -1,0 +1,12 @@
+--- a/src/scripts/version
++++ b/src/scripts/version
+@@ -13,6 +13,9 @@
+ # See the License for the specific language governing permissions and
+ # limitations under the License.
+ 
++echo "23.06-rc1"
++exit 1
++
+ path=$( cd "$(dirname "${BASH_SOURCE}")" ; pwd -P )
+ 
+ cd "$path"

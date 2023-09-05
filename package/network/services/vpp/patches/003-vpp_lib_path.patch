@@ -1,0 +1,81 @@
+Index: vpp-23.06-rc1/src/CMakeLists.txt
+===================================================================
+--- vpp-23.06-rc1.orig/src/CMakeLists.txt
++++ vpp-23.06-rc1/src/CMakeLists.txt
+@@ -20,6 +20,9 @@ project(vpp C)
+ if(NOT DEFINED CMAKE_INSTALL_LIBDIR AND EXISTS "/etc/debian_version")
+   set(CMAKE_INSTALL_LIBDIR "lib/${CMAKE_LIBRARY_ARCHITECTURE}")
+ endif()
++add_compile_options("-Wno-implicit-function-declaration")
++add_compile_options("-Wno-int-conversion")
++
+ 
+ include(CheckCCompilerFlag)
+ include(CheckIPOSupported)
+Index: vpp-23.06-rc1/configure
+===================================================================
+--- vpp-23.06-rc1.orig/configure
++++ vpp-23.06-rc1/configure
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env bash
++#!/usr/bin/env bash${STAGING_DIR}/usr/lib
+ set -o pipefail -o errtrace -o nounset -o errexit
+ 
+ # Experimental script, please consult with dmarion@me.com before
+@@ -110,7 +110,7 @@ if [ "${arch}" != "${host_arch}" ] ; the
+   args+=("-DCMAKE_C_COMPILER=clang")
+   args+=("-DCMAKE_C_COMPILER_TARGET=${arch}-linux-gnu")
+   args+=("-DCMAKE_ASM_COMPILER_TARGET=${arch}-linux-gnu")
+-  args+=("-DCMAKE_FIND_ROOT_PATH=/usr/${arch}-linux-gnu")
++  args+=("-DCMAKE_FIND_ROOT_PATH=${arch}-linux-gnu")
+   args+=("-DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER")
+   args+=("-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=BOTH")
+   args+=("-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=BOTH")
+Index: vpp-23.06-rc1/src/cmake/plugin.cmake
+===================================================================
+--- vpp-23.06-rc1.orig/src/cmake/plugin.cmake
++++ vpp-23.06-rc1/src/cmake/plugin.cmake
+@@ -128,3 +128,15 @@ if (NOT ${var})
+ endif()
+     message(STATUS "${plugin} plugin needs ${name} library - found at ${${var}}")
+ endmacro()
++
++
++macro(vpp_plugin_find_library_by_path plugin var name)
++	find_library(${var} NAMES ${name} PATHS $ENV{STAGING_DIR}/usr/lib)
++	mark_as_advanced(${var})
++if (NOT ${var})
++	message(WARNING "--${name} library not found - ${plugin} plugin disabled")
++	return()
++endif()
++	message(STATUS "${plugin} plugin needs ${name} library - found at ${${var}}")
++endmacro()
++
+Index: vpp-23.06-rc1/src/plugins/dpdk/CMakeLists.txt
+===================================================================
+--- vpp-23.06-rc1.orig/src/plugins/dpdk/CMakeLists.txt
++++ vpp-23.06-rc1/src/plugins/dpdk/CMakeLists.txt
+@@ -90,7 +90,7 @@ else()
+     ##############################################################################
+     # libnuma
+     ##############################################################################
+-    vpp_plugin_find_library(dpdk NUMA_LIB "numa")
++    vpp_plugin_find_library_by_path(dpdk NUMA_LIB "numa")
+     list(APPEND DPDK_LINK_LIBRARIES ${NUMA_LIB})
+ 
+     ##############################################################################
+Index: vpp-23.06-rc1/src/plugins/linux-cp/CMakeLists.txt
+===================================================================
+--- vpp-23.06-rc1.orig/src/plugins/linux-cp/CMakeLists.txt
++++ vpp-23.06-rc1/src/plugins/linux-cp/CMakeLists.txt
+@@ -24,8 +24,8 @@ if (NOT LIBMNL_INCLUDE_DIR)
+   return()
+ endif()
+ 
+-vpp_plugin_find_library(linux-cp LIBNL3_LIB libnl-3.so)
+-vpp_plugin_find_library(linux-cp LIBNL3_ROUTE_LIB libnl-route-3.so.200)
++vpp_plugin_find_library_by_path(linux-cp LIBNL3_LIB libnl-3.so)
++vpp_plugin_find_library_by_path(linux-cp LIBNL3_ROUTE_LIB libnl-route-3.so.200)
+ 
+ include_directories(${LIBNL3_INCLUDE_DIR}/libnl3)
+ include_directories(${LIBMNL_INCLUDE_DIR})

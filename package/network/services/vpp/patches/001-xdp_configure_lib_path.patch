@@ -1,0 +1,13 @@
+Index: vpp-23.06-rc1/build/external/packages/xdp-tools.mk
+===================================================================
+--- vpp-23.06-rc1.orig/build/external/packages/xdp-tools.mk
++++ vpp-23.06-rc1/build/external/packages/xdp-tools.mk
+@@ -24,7 +24,7 @@ define  xdp-tools_config_cmds
+ endef
+ 
+ define  xdp-tools_build_cmds
+-	@cd ${xdp-tools_src_dir} && make V=1 BUILD_STATIC_ONLY=y > $(xdp-tools_build_log)
++@cd ${xdp-tools_src_dir} && make V=1 BUILD_STATIC_ONLY=y LDLIBS+=-L$(xdp-tools_src_dir)/lib/libbpf/src LDLIBS+=-L$(xdp-tools_src_dir)/lib/libxdp LDLIBS+=-l:libxdp.a LDLIBS+=-l:libbpf.a LDLIBS+=-L$(STAGING_DIR)/usr/lib LDLIBS+=-lz LDLIBS+=-L$(STAGING_DIR)/usr/lib LDLIBS+=-lelf LDLIBS+=-lpcap > $(xdp-tools_build_log)
+ endef
+ 
+ define  xdp-tools_install_cmds

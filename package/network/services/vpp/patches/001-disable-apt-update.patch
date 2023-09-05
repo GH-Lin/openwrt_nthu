@@ -1,0 +1,132 @@
+Index: vpp-23.06-rc1/Makefile
+===================================================================
+--- vpp-23.06-rc1.orig/Makefile
++++ vpp-23.06-rc1/Makefile
+@@ -290,26 +290,26 @@
+ ifeq ($(findstring y,$(UNATTENDED)),y)
+ 	make install-dep
+ endif
+-ifeq ($(filter ubuntu debian,$(OS_ID)),$(OS_ID))
+-	@MISSING=$$(apt-get install -y -qq -s $(DEB_DEPENDS) | grep "^Inst ") ; \
+-	if [ -n "$$MISSING" ] ; then \
+-	  echo "\nPlease install missing packages: \n$$MISSING\n" ; \
+-	  echo "by executing \"make install-dep\"\n" ; \
+-	  exit 1 ; \
+-	fi ; \
+-	exit 0
+-else ifneq ("$(wildcard /etc/redhat-release)","")
+-	@for i in $(RPM_DEPENDS) ; do \
+-	    RPM=$$(basename -s .rpm "$${i##*/}" | cut -d- -f1,2,3,4)  ;	\
+-	    MISSING+=$$(rpm -q $$RPM | grep "^package")	   ;    \
+-	done							   ;	\
+-	if [ -n "$$MISSING" ] ; then \
+-	  echo "Please install missing RPMs: \n$$MISSING\n" ; \
+-	  echo "by executing \"make install-dep\"\n" ; \
+-	  exit 1 ; \
+-	fi ; \
+-	exit 0
+-endif
++#ifeq ($(filter ubuntu debian,$(OS_ID)),$(OS_ID))
++#	@MISSING=$$(apt-get install -y -qq -s $(DEB_DEPENDS) | grep "^Inst ") ; \
++#	if [ -n "$$MISSING" ] ; then \
++#	  echo "\nPlease install missing packages: \n$$MISSING\n" ; \
++#	  echo "by executing \"make install-dep\"\n" ; \
++#	  exit 1 ; \
++#	fi ; \
++#	exit 0
++#else ifneq ("$(wildcard /etc/redhat-release)","")
++#	@for i in $(RPM_DEPENDS) ; do \
++#	    RPM=$$(basename -s .rpm "$${i##*/}" | cut -d- -f1,2,3,4)  ;	\
++#	    MISSING+=$$(rpm -q $$RPM | grep "^package")	   ;    \
++#	done							   ;	\
++#	if [ -n "$$MISSING" ] ; then \
++#	  echo "Please install missing RPMs: \n$$MISSING\n" ; \
++#	  echo "by executing \"make install-dep\"\n" ; \
++#	  exit 1 ; \
++#	fi ; \
++#	exit 0
++#endif
+ 	@touch $@
+ 
+ .PHONY: bootstrap
+@@ -318,43 +318,43 @@
+ 
+ .PHONY: install-dep
+ install-dep:
+-ifeq ($(filter ubuntu debian,$(OS_ID)),$(OS_ID))
+-	@sudo -E apt-get update
+-	@sudo -E apt-get $(APT_ARGS) $(CONFIRM) $(FORCE) install $(DEB_DEPENDS)
+-else ifneq ("$(wildcard /etc/redhat-release)","")
+-ifeq ($(OS_ID),rhel)
+-	@sudo -E yum-config-manager --enable rhel-server-rhscl-7-rpms
+-	@sudo -E yum groupinstall $(CONFIRM) $(RPM_DEPENDS_GROUPS)
+-	@sudo -E yum install $(CONFIRM) $(RPM_DEPENDS)
+-	@sudo -E debuginfo-install $(CONFIRM) glibc openssl-libs zlib
+-else ifeq ($(OS_ID),rocky)
+-	@sudo -E dnf install $(CONFIRM) dnf-plugins-core epel-release
+-	@sudo -E dnf config-manager --set-enabled \
+-          $(shell dnf repolist all 2>/dev/null|grep -i crb|cut -d' ' -f1|grep -v source)
+-	@sudo -E dnf groupinstall $(CONFIRM) $(RPM_DEPENDS_GROUPS)
+-	@sudo -E dnf install $(CONFIRM) $(RPM_DEPENDS)
+-else ifeq ($(OS_ID)-$(OS_VERSION_ID),centos-8)
+-	@sudo -E dnf install $(CONFIRM) dnf-plugins-core epel-release
+-	@sudo -E dnf config-manager --set-enabled \
+-          $(shell dnf repolist all 2>/dev/null|grep -i powertools|cut -d' ' -f1|grep -v source)
+-	@sudo -E dnf groupinstall $(CONFIRM) $(RPM_DEPENDS_GROUPS)
+-	@sudo -E dnf install --skip-broken $(CONFIRM) $(RPM_DEPENDS)
+-else ifeq ($(OS_ID),centos)
+-	@sudo -E yum install $(CONFIRM) centos-release-scl-rh epel-release
+-	@sudo -E yum groupinstall $(CONFIRM) $(RPM_DEPENDS_GROUPS)
+-	@sudo -E yum install $(CONFIRM) $(RPM_DEPENDS)
+-	@sudo -E yum install $(CONFIRM) --enablerepo=base-debuginfo $(RPM_DEPENDS_DEBUG)
+-else ifeq ($(OS_ID),fedora)
+-	@sudo -E dnf groupinstall $(CONFIRM) $(RPM_DEPENDS_GROUPS)
+-	@sudo -E dnf install $(CONFIRM) $(RPM_DEPENDS)
+-	@sudo -E debuginfo-install $(CONFIRM) glibc openssl-libs zlib
+-endif
+-else ifeq ($(filter opensuse-leap-15.3 opensuse-leap-15.4 ,$(OS_ID)-$(OS_VERSION_ID)),$(OS_ID)-$(OS_VERSION_ID))
+-	@sudo -E zypper refresh
+-	@sudo -E zypper install  -y $(RPM_SUSE_DEPENDS)
+-else
+-	$(error "This option currently works only on Ubuntu, Debian, RHEL, CentOS or openSUSE-leap systems")
+-endif
++#ifeq ($(filter ubuntu debian,$(OS_ID)),$(OS_ID))
++#	@sudo -E apt-get update
++#	@sudo -E apt-get $(APT_ARGS) $(CONFIRM) $(FORCE) install $(DEB_DEPENDS)
++#else ifneq ("$(wildcard /etc/redhat-release)","")
++#ifeq ($(OS_ID),rhel)
++#	@sudo -E yum-config-manager --enable rhel-server-rhscl-7-rpms
++#	@sudo -E yum groupinstall $(CONFIRM) $(RPM_DEPENDS_GROUPS)
++#	@sudo -E yum install $(CONFIRM) $(RPM_DEPENDS)
++#	@sudo -E debuginfo-install $(CONFIRM) glibc openssl-libs zlib
++#else ifeq ($(OS_ID),rocky)
++#	@sudo -E dnf install $(CONFIRM) dnf-plugins-core epel-release
++#	@sudo -E dnf config-manager --set-enabled \
++#          $(shell dnf repolist all 2>/dev/null|grep -i crb|cut -d' ' -f1|grep -v source)
++#	@sudo -E dnf groupinstall $(CONFIRM) $(RPM_DEPENDS_GROUPS)
++#	@sudo -E dnf install $(CONFIRM) $(RPM_DEPENDS)
++#else ifeq ($(OS_ID)-$(OS_VERSION_ID),centos-8)
++#	@sudo -E dnf install $(CONFIRM) dnf-plugins-core epel-release
++#	@sudo -E dnf config-manager --set-enabled \
++#          $(shell dnf repolist all 2>/dev/null|grep -i powertools|cut -d' ' -f1|grep -v source)
++#	@sudo -E dnf groupinstall $(CONFIRM) $(RPM_DEPENDS_GROUPS)
++#	@sudo -E dnf install --skip-broken $(CONFIRM) $(RPM_DEPENDS)
++#else ifeq ($(OS_ID),centos)
++#	@sudo -E yum install $(CONFIRM) centos-release-scl-rh epel-release
++#	@sudo -E yum groupinstall $(CONFIRM) $(RPM_DEPENDS_GROUPS)
++#	@sudo -E yum install $(CONFIRM) $(RPM_DEPENDS)
++#	@sudo -E yum install $(CONFIRM) --enablerepo=base-debuginfo $(RPM_DEPENDS_DEBUG)
++#else ifeq ($(OS_ID),fedora)
++#	@sudo -E dnf groupinstall $(CONFIRM) $(RPM_DEPENDS_GROUPS)
++#	@sudo -E dnf install $(CONFIRM) $(RPM_DEPENDS)
++#	@sudo -E debuginfo-install $(CONFIRM) glibc openssl-libs zlib
++#endif
++#else ifeq ($(filter opensuse-leap-15.3 opensuse-leap-15.4 ,$(OS_ID)-$(OS_VERSION_ID)),$(OS_ID)-$(OS_VERSION_ID))
++#	@sudo -E zypper refresh
++#	@sudo -E zypper install  -y $(RPM_SUSE_DEPENDS)
++#else
++#	$(error "This option currently works only on Ubuntu, Debian, RHEL, CentOS or openSUSE-leap systems")
++#endif
+ 	git config commit.template .git_commit_template.txt
+ 
+ .PHONY: install-deps
