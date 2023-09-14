@@ -21,6 +21,7 @@ PKG_FORTIFY_SOURCE:=2
 
 include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/cmake.mk
+include $(INCLUDE_DIR)/nls.mk
 
 TARGET_CFLAGS += -I$(STAGING_DIR)/include
 TARGET_LDFLAGS += -L$(STAGING_DIR)/usr/lib -L$(STAGING_DIR)/lib

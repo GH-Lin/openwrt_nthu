@@ -1,0 +1,39 @@
+
+Index: vpp-23.06-rc1/build/external/patches/xdp-tools_1.2.9/0004-libxdp-disable-system-libbpf.patch
+===================================================================
+--- /dev/null
++++ vpp-23.06-rc1/build/external/patches/xdp-tools_1.2.9/0004-libxdp-disable-system-libbpf.patch
+@@ -0,0 +1,33 @@
++--- a/configure
+++++ b/configure
++@@ -289,18 +289,18 @@
++ }
++ EOF
++ 
++-        libbpf_err=$($CC -o $TMPDIR/libbpftest $TMPDIR/libbpftest.c -Werror $LIBBPF_CFLAGS $LIBBPF_LDLIBS 2>&1)
++-        if [ "$?" -eq "0" ]; then
++-            echo "SYSTEM_LIBBPF:=y" >>$CONFIG
++-            echo "LIBBPF_VERSION=$LIBBPF_VERSION" >>$CONFIG
++-            echo 'CFLAGS += ' $LIBBPF_CFLAGS >> $CONFIG
++-            echo 'LDLIBS += ' $LIBBPF_LDLIBS >>$CONFIG
++-            echo 'OBJECT_LIBBPF = ' >>$CONFIG
++-            echo "system v$LIBBPF_VERSION"
++-
++-            check_libbpf_functions "$LIBBPF_CFLAGS" "$LIBBPF_LDLIBS"
++-            return 0
++-        fi
+++#        libbpf_err=$($CC -o $TMPDIR/libbpftest $TMPDIR/libbpftest.c -Werror $LIBBPF_CFLAGS $LIBBPF_LDLIBS 2>&1)
+++#        if [ "$?" -eq "0" ]; then
+++#            echo "SYSTEM_LIBBPF:=y" >>$CONFIG
+++#            echo "LIBBPF_VERSION=$LIBBPF_VERSION" >>$CONFIG
+++#            echo 'CFLAGS += ' $LIBBPF_CFLAGS >> $CONFIG
+++#            echo 'LDLIBS += ' $LIBBPF_LDLIBS >>$CONFIG
+++#            echo 'OBJECT_LIBBPF = ' >>$CONFIG
+++#            echo "system v$LIBBPF_VERSION"
+++#
+++#            check_libbpf_functions "$LIBBPF_CFLAGS" "$LIBBPF_LDLIBS"
+++#            return 0
+++#        fi
++     else
++         libbpf_err="${PKG_CONFIG} couldn't find libbpf"
++     fi
